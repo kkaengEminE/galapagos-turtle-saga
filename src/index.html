@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>갈라파고스 땅거북이</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; }
+    canvas { display: block; }
+
+    #title-screen {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #1a472a 0%, #2d6a4f 50%, #40916c 100%);
+      z-index: 100;
+    }
+    #title-screen h1 {
+      font-size: 3rem; color: #f0e68c;
+      text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+      margin-bottom: 0.5rem;
+    }
+    #title-screen p {
+      font-size: 1.1rem; color: #d4edda; margin-bottom: 2rem;
+    }
+    #title-screen button {
+      padding: 14px 40px; font-size: 1.2rem;
+      border: none; border-radius: 8px; cursor: pointer;
+      margin: 8px; transition: transform 0.15s, box-shadow 0.15s;
+    }
+    #title-screen button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    #btn-start { background: #f0e68c; color: #1a472a; font-weight: bold; }
+    #btn-info  { background: rgba(255,255,255,0.15); color: #fff; }
+
+    #end-screen {
+      position: absolute; inset: 0;
+      display: none; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.85);
+      z-index: 100;
+    }
+    #end-screen h1 { font-size: 3rem; color: #f0e68c; margin-bottom: 1rem; }
+    #end-screen p { color: #ccc; margin-bottom: 2rem; font-size: 1.2rem; }
+    #end-screen button {
+      padding: 14px 40px; font-size: 1.2rem;
+      background: #f0e68c; color: #1a472a;
+      border: none; border-radius: 8px; cursor: pointer;
+      font-weight: bold;
+    }
+
+    #game-over-screen {
+      position: absolute; inset: 0;
+      display: none; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: rgba(80,0,0,0.85);
+      z-index: 100;
+    }
+    #game-over-screen h1 { font-size: 3rem; color: #ff6b6b; margin-bottom: 1rem; }
+    #game-over-screen p { color: #ccc; margin-bottom: 2rem; font-size: 1.2rem; }
+    #game-over-screen button {
+      padding: 14px 40px; font-size: 1.2rem;
+      background: #ff6b6b; color: #fff;
+      border: none; border-radius: 8px; cursor: pointer;
+      font-weight: bold;
+    }
+
+    #info-modal {
+      position: absolute; inset: 0;
+      display: none; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.7);
+      z-index: 200;
+    }
+    #info-modal .modal-content {
+      background: #2d6a4f; color: #fff;
+      padding: 2rem; border-radius: 12px;
+      max-width: 500px; text-align: center;
+    }
+    #info-modal .modal-content h2 { color: #f0e68c; margin-bottom: 1rem; }
+    #info-modal .modal-content p { line-height: 1.7; margin-bottom: 1.5rem; }
+    #info-modal .modal-content button {
+      padding: 10px 30px; background: #f0e68c; color: #1a472a;
+      border: none; border-radius: 6px; cursor: pointer; font-weight: bold;
+    }
+
+    #stage-banner {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2.5rem; color: #f0e68c;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+      z-index: 50; pointer-events: none;
+      opacity: 0; transition: opacity 0.5s;
+    }
+  </style>
+</head>
+<body>
+  <!-- Title Screen -->
+  <div id="title-screen">
+    <h1>🐢 갈라파고스 땅거북이</h1>
+    <p>AI 기반 튜토리얼 + 보스 전투</p>
+    <button id="btn-start">시작하기</button>
+    <button id="btn-info">갈라파고스 땅거북이란?</button>
+  </div>
+
+  <!-- Info Modal -->
+  <div id="info-modal">
+    <div class="modal-content">
+      <h2>갈라파고스 땅거북이란?</h2>
+      <p>
+        갈라파고스 땅거북이는 세계에서 가장 큰 거북이 종으로,
+        갈라파고스 제도에 서식합니다.<br><br>
+        이 게임에서는 젊은 거북이가 잎이 달린 막대기를 들고
+        위험한 모험을 떠납니다.<br><br>
+        다리를 건너고, 점프하고, 스킬을 익혀
+        최종 보스 히포를 물리치세요!
+      </p>
+      <button id="btn-close-info">닫기</button>
+    </div>
+  </div>
+
+  <!-- End Screen -->
+  <div id="end-screen">
+    <h1>🎉 승리!</h1>
+    <p>히포를 물리쳤습니다! 갈라파고스 땅거북이의 모험이 끝났습니다.</p>
+    <button id="btn-restart-end">다시 시작</button>
+  </div>
+
+  <!-- Game Over Screen -->
+  <div id="game-over-screen">
+    <h1>💀 게임 오버</h1>
+    <p>거북이가 쓰러졌습니다...</p>
+    <button id="btn-restart-gameover">다시 시작</button>
+  </div>
+
+  <!-- Stage Banner -->
+  <div id="stage-banner"></div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

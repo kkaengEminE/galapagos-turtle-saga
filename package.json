@@ -1,0 +1,19 @@
+{
+  "name": "galapagos-turtle-saga",
+  "version": "1.0.0",
+  "description": "Galapagos Turtle - AI-based tutorial + boss battle game",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "cannon-es": "^0.20.0",
+    "dat.gui": "^0.7.9",
+    "three": "^0.162.0"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0"
+  }
+}
